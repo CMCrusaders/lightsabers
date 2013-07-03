@@ -25,75 +25,78 @@ public class PlayerInteractListener implements Listener {
 		if (player.isOp() || player.hasPermission("lightsabers.use")) {
 
 			if (item != null) {
+				
+				if (item.hasItemMeta()) {
+					
+					ItemMeta meta = item.getItemMeta();
 
-				ItemMeta meta = item.getItemMeta();
+					if (meta.hasDisplayName()) {
 
-				if (meta.hasDisplayName()) {
+						if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-					if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+							/*
+							 * TRANSITION: Stick into lightsaber
+							 */
 
-						/*
-						 * TRANSITION: Stick into lightsaber
-						 */
+							if (item.getType() == Material.STICK) {
 
-						if (item.getType() == Material.STICK) {
+								// Check if stick has name "Handle"
+								if (ChatColor.stripColor(meta.getDisplayName()).trim().equalsIgnoreCase("lightsaber handle")) {
 
-							// Check if stick has name "Handle"
-							if (ChatColor.stripColor(meta.getDisplayName()).trim().equalsIgnoreCase("handle")) {
+									// New lightsaber
+									ItemStack lightSaber = new ItemStack(Material.DIAMOND_SWORD, 1);
+									lightSaber.addEnchantment(Enchantment.DAMAGE_ALL, 2);
 
-								// New lightsaber
-								ItemStack lightSaber = new ItemStack(Material.DIAMOND_SWORD, 1);
-								lightSaber.addEnchantment(Enchantment.DAMAGE_ALL, 2);
+									ItemMeta saberMeta = lightSaber.getItemMeta();
+									saberMeta.setDisplayName(ChatColor.AQUA + "LightSaber");
+									lightSaber.setItemMeta(saberMeta);
 
-								ItemMeta saberMeta = lightSaber.getItemMeta();
-								saberMeta.setDisplayName(ChatColor.AQUA + "LightSaber");
-								lightSaber.setItemMeta(saberMeta);
+									player.setItemInHand(lightSaber);
 
-								player.setItemInHand(lightSaber);
+									// Transition effects
+									player.playSound(player.getLocation(), Sound.BLAZE_BREATH, 1, 5);
+									player.playEffect(player.getLocation().add(0.5, 1, 0.5), Effect.SMOKE, 4);
 
-								// Transition effects
-								player.playSound(player.getLocation(), Sound.BLAZE_BREATH, 1, 5);
-								player.playEffect(player.getLocation().add(0.5, 1, 0.5), Effect.SMOKE, 4);
+									return;
+								}
+							}
 
-								return;
+							/*
+							 * TRANSITION: Lightsaber back into stick
+							 */
+
+							if (item.getType() == Material.DIAMOND_SWORD) {
+
+								// Check if lightsaber has name "Lightsaber"
+								if (ChatColor.stripColor(meta.getDisplayName()).trim().equalsIgnoreCase("lightsaber")) {
+
+									// New handle
+									ItemStack handle = new ItemStack(Material.STICK, 1);
+
+									ItemMeta handleMeta = handle.getItemMeta();
+									handleMeta.setDisplayName("Lightsaber Handle");
+									handle.setItemMeta(handleMeta);
+
+									player.setItemInHand(handle);
+
+									// Transition effects
+									player.playSound(player.getLocation(), Sound.BLAZE_BREATH, 1, 5);
+									player.playEffect(player.getLocation().add(0.5, 1, 0.5), Effect.SMOKE, 4);
+								}
 							}
 						}
 
-						/*
-						 * TRANSITION: Lightsaber back into stick
-						 */
+						// Lightsaber sound effect
+						else if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
-						if (item.getType() == Material.DIAMOND_SWORD) {
+							if (item.getType() == Material.DIAMOND_SWORD && meta.getDisplayName().trim().equalsIgnoreCase("lightsaber")) {
 
-							// Check if lightsaber has name "Lightsaber"
-							if (ChatColor.stripColor(meta.getDisplayName()).trim().equalsIgnoreCase("lightsaber")) {
-
-								// New handle
-								ItemStack handle = new ItemStack(Material.STICK, 1);
-
-								ItemMeta handleMeta = handle.getItemMeta();
-								handleMeta.setDisplayName("Handle");
-								handle.setItemMeta(handleMeta);
-
-								player.setItemInHand(handle);
-
-								// Transition effects
-								player.playSound(player.getLocation(), Sound.BLAZE_BREATH, 1, 5);
-								player.playEffect(player.getLocation().add(0.5, 1, 0.5), Effect.SMOKE, 4);
+								player.playSound(player.getLocation(), Sound.BLAZE_BREATH, 10, 5);
 							}
 						}
 					}
 
-					//Lightsaber sound effect
-					else if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-
-						if (item.getType() == Material.DIAMOND_SWORD && meta.getDisplayName().equalsIgnoreCase("lightsaber")) {
-							
-							player.playSound(player.getLocation(), Sound.BLAZE_BREATH, 10, 5);
-						}
-					}
 				}
-
 			}
 
 		}
